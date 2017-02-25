@@ -1,0 +1,55 @@
+Celarian C# Style Guide
+
+General
+    - Indent with 4 spaces. Use smart indention (backspace deletes tab-like spaces) if possible.
+    - Try to keep lines (without long string constants) under 100 columns.
+    - REALLY try to keep lines (without long string constants) under 120 columns.
+    - Move long string constants into locals if possible.
+    - Avoid #regions - if you feel you need them, some refactoring is probably in order.
+
+Naming
+    - Names of all classes, structs, interfaces, delegates (basically any namespace-owned thing) should be PascalCase.
+    - All public members of classes, structs, interfaces, enums, etc. should be PascalCase.
+    - All constants, events, enums, and enum values should be PascalCase. Avoid ALLCAPS unless it's a P/Invoke enum for Win32.
+    - Private fields and function arguments/locals should be camelCase.
+    - Hungarian notation should only be used for UI controls (LabelAmount, TextPhoneNumber).
+    - For properties that wrap around fields (which can't be auto-properties for whatever reason), name them in the camelCase variant of the property name.
+    
+Classes
+    - All classes should be sealed unless inheritance is specifically designed for.
+    - Classes should have a public contract and stick to it.
+    - All fields should be private.
+    - You can place field and property initializers on their declaration; you don't need them in the constructor.
+    - Public and internal members should have XML documentation. Private members can use a simple comment above them.
+    - Form Load event handlers should be right below constructors.
+
+Structs
+    - Struct fields should be private unless there's a compelling performance reason to making them public.
+    - Structs should also be immutable unless there's a compelling performance reason to making them public.
+    - Don't use too many reference types in structs.
+
+Brackets
+    - Brackets should be in Allman style:
+        if (condition)
+        {
+            // code
+        }
+    - Brackets can also be on a single line for single statements:
+        if (!valid) { return; }
+
+In Methods
+    - It's a good idea to state preconditions in some form (typically parameter validation).
+    - Wrap subexpressions in parentheses to clarify their intent.
+    - Lift subexpressions out of really complex expressions and put them in locals.
+    - Concatenating two strings with + outside of a loop is okay.
+    - StringBuilders are your friend if you have a lot of strings to concatenate.
+    - Declare locals with var whenever possible; the variable's type is typically easy to determine.
+    - int is a good type for most numbers in general.
+    - Use using blocks for IDisposable-implementing types.
+    - Assign lambdas as event handlers for simple handlers you don't need to remove later.
+
+Collections
+    - Expose collections in properties as read-only unless you intend for callers to modify the collections.
+    - Accept the most liberal collection type (IEnumerable<T>, typically) in function arguments.
+    - Return the collection type that makes the most sense.
+    - Lists are good general-case collections.
