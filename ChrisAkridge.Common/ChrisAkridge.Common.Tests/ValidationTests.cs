@@ -27,6 +27,7 @@ namespace ChrisAkridge.Common.Tests
         {
             object obj = null;
 
+            bool success = false;
             try
             {
                 var validation = Validate.Begin().IsNotNull(obj, "obj").Check();
@@ -35,8 +36,11 @@ namespace ChrisAkridge.Common.Tests
             {
                 Assert.AreEqual(vfex.Exceptions.Count(), 1);
                 List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
                 Assert.IsTrue(ExpectingException(typeof(ArgumentNullException), exceptions[0]));
             }
+
+            if (!success) { Assert.Fail(); }
         }
 
 		[TestMethod]
@@ -88,6 +92,7 @@ namespace ChrisAkridge.Common.Tests
         {
             var sequence = new List<string>();
 
+            bool success = false;
             try
             {
                 var validation = Validate.Begin().SequenceHasElements(sequence, nameof(sequence)).Check();
@@ -95,8 +100,11 @@ namespace ChrisAkridge.Common.Tests
             catch (ValidationFailedException vfex)
             {
                 Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                success = true;
                 Assert.IsTrue(ExpectingException(typeof(ArgumentException), vfex.Exceptions.First()));
             }
+
+            if (!success) { Assert.Fail(); }
         }
 
         [TestMethod]
@@ -104,7 +112,7 @@ namespace ChrisAkridge.Common.Tests
         {
             int value = 3;
 
-            var validation = Validate.Begin().NumberIsNotNegative(value, nameof(value)).Check();
+            var validation = Validate.Begin().IsNotNegative(value, nameof(value)).Check();
             if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
         }
 
@@ -113,16 +121,20 @@ namespace ChrisAkridge.Common.Tests
         {
             int value = -3;
 
+            bool success = false;
             try
             {
-                var validation = Validate.Begin().NumberIsNotNegative(value, nameof(value)).Check();
+                var validation = Validate.Begin().IsNotNegative(value, nameof(value)).Check();
             }
             catch (ValidationFailedException vfex)
             {
                 Assert.AreEqual(vfex.Exceptions.Count(), 1);
                 List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
                 Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
             }
+
+            if (!success) { Assert.Fail(); }
         }
 
         [TestMethod]
@@ -132,7 +144,7 @@ namespace ChrisAkridge.Common.Tests
             int max = 100;
             int value = 50;
 
-            var validation = Validate.Begin().NumberWithinRangeInclusive(min, max, value, "value").Check();
+            var validation = Validate.Begin().InRangeInclusive(min, max, value, "value").Check();
             if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
         }
 
@@ -143,16 +155,20 @@ namespace ChrisAkridge.Common.Tests
             int max = 100;
             int value = 101;
 
+            bool success = false;
             try
             {
-                var validation = Validate.Begin().NumberWithinRangeInclusive(min, max, value, "value").Check();
+                var validation = Validate.Begin().InRangeInclusive(min, max, value, "value").Check();
             }
             catch (ValidationFailedException vfex)
             {
                 Assert.AreEqual(vfex.Exceptions.Count(), 1);
                 List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
                 Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
             }
+
+            if (!success) { Assert.Fail(); }
         }
 
         [TestMethod]
@@ -169,6 +185,7 @@ namespace ChrisAkridge.Common.Tests
         {
             bool value = false;
 
+            bool success = false;
             try
             {
                 var validation = Validate.Begin().IsTrue(value, "value is true").Check();
@@ -177,8 +194,11 @@ namespace ChrisAkridge.Common.Tests
             {
                 Assert.AreEqual(vfex.Exceptions.Count(), 1);
                 List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
                 Assert.IsTrue(ExpectingException(typeof(ValidationException), exceptions[0]));
             }
+
+            if (!success) { Assert.Fail(); }
         }
 
         [TestMethod]
@@ -195,6 +215,7 @@ namespace ChrisAkridge.Common.Tests
         {
             bool value = true;
 
+            bool success = false;
             try
             {
                 var validation = Validate.Begin().IsFalse(value, "value is false").Check();
@@ -203,8 +224,120 @@ namespace ChrisAkridge.Common.Tests
             {
                 Assert.AreEqual(vfex.Exceptions.Count(), 1);
                 List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
                 Assert.IsTrue(ExpectingException(typeof(ValidationException), exceptions[0]));
             }
+
+            if (!success) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsZero_WithNonZero()
+        {
+            int value = 1;
+
+            var validation = Validate.Begin().IsNotZero(value, "value").Check();
+            if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsZero_WithZero()
+        {
+            int value = 0;
+
+            bool success = false;
+            try
+            {
+                var validation = Validate.Begin().IsNotZero(value, "value").Check();
+            }
+            catch (ValidationFailedException vfex)
+            {
+                Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
+                Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+            }
+
+            if (!success) { Assert.Fail(); }
+        }
+
+        public enum TestEnum
+        {
+            Default = 0,
+            CherrySoda,
+            DietSprite,
+            RootBeer
+        }
+
+        [Flags]
+        public enum TestFlagsEnum
+        {
+            NoToppings = 0,
+            TomatoSauce = 1,
+            Hamburger = 2,
+            Mozzarella = 4,
+            Pepperoni = 8,
+            Pineapple = 16
+        }
+
+        [TestMethod]
+        public void IsValidEnumValue_GoodValue()
+        {
+            var value = TestEnum.CherrySoda;
+
+            var validation = Validate.Begin().IsValidEnumValue(value, "value").Check();
+            if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsValidEnumValue_GoodFlags()
+        {
+            var value = TestFlagsEnum.TomatoSauce | TestFlagsEnum.Mozzarella | TestFlagsEnum.Hamburger;
+
+            var validation = Validate.Begin().IsValidEnumValue(value, "value").Check();
+            if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsValidEnumValue_BadValue()
+        {
+            var value = (TestEnum)246;
+
+            bool success = false;
+            try
+            {
+                var validation = Validate.Begin().IsValidEnumValue(value, "value").Check();
+            }
+            catch (ValidationFailedException vfex)
+            {
+                Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
+                Assert.IsTrue(ExpectingException(typeof(ArgumentException), exceptions[0]));
+            }
+
+            if (!success) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsValidEnumValue_BadFlags()
+        {
+            var value = (TestFlagsEnum)0x7FFFFFFF;
+
+            bool success = false;
+            try
+            {
+                var validation = Validate.Begin().IsValidEnumValue(value, "value").Check();
+            }
+            catch (ValidationFailedException vfex)
+            {
+                Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
+                Assert.IsTrue(ExpectingException(typeof(ArgumentException), exceptions[0]));
+            }
+
+            if (!success) { Assert.Fail(); }
         }
     }
 }

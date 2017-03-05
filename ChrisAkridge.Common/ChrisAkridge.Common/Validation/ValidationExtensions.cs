@@ -65,7 +65,7 @@ namespace ChrisAkridge.Common.Validation
             else { return validation; }
         }
 
-        public static Validation NumberIsNotNegative(this Validation validation, int value, 
+        public static Validation IsNotNegative(this Validation validation, int value, 
             string valueName)
         {
             if (value < 0)
@@ -76,12 +76,35 @@ namespace ChrisAkridge.Common.Validation
             else { return validation; }
         }
 
-        public static Validation NumberWithinRangeInclusive(this Validation validation,
+        public static Validation IsNotZero(this Validation validation, int value,
+            string valueName)
+        {
+            if (value == 0)
+            {
+                var ex = new ArgumentOutOfRangeException(valueName, $"{valueName} is zero");
+                return (validation ?? new Validation()).AddException(ex);
+            }
+            else { return validation; }
+        }
+
+        public static Validation InRangeInclusive(this Validation validation,
             int minInclusive, int maxInclusive, int param, string paramName)
         {
             if (param < minInclusive || param > maxInclusive)
             {
                 var ex = new ArgumentOutOfRangeException($"{paramName} is out of range (Value: {param}, Range: [{minInclusive}-{maxInclusive}]");
+                return (validation ?? new Validation()).AddException(ex);
+            }
+            return validation;
+        }
+
+        public static Validation IsValidEnumValue<TEnum>(this Validation validation,
+            TEnum param, string paramName) where TEnum : struct
+        {
+            if (!Validators.IsValid(param))
+            {
+                string enumTypeName = typeof(TEnum).Name;
+                var ex = new ArgumentException($"{paramName} does not have a valid value in the {enumTypeName} enum.");
                 return (validation ?? new Validation()).AddException(ex);
             }
             return validation;
