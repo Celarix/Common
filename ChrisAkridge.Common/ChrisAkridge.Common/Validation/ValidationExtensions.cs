@@ -19,6 +19,17 @@ namespace ChrisAkridge.Common.Validation
 			throw new ValidationFailedException(validation);
 		}
 
+		public static Validation AreEqual<T>(this Validation validation,
+			T param1, string param1Name, T param2, string param2Name) 
+		{
+			if (!param1.Equals(param2))
+			{
+				var ex = new ArgumentException($"{param1Name} ({param1}) is not equal to {param2Name} ({param2}).");
+				return (validation ?? new Validation()).AddException(ex);
+			}
+			return validation;
+		}
+
         public static Validation IsTrue(this Validation validation, bool value,
             string failureMessage)
         {
@@ -53,50 +64,6 @@ namespace ChrisAkridge.Common.Validation
 			}
 			else { return validation; }
 		}
-
-        public static Validation SequenceHasElements<T>(this Validation validation, 
-            IEnumerable<T> sequence, string paramName )
-        {
-            if (!sequence.Any())
-            {
-                var ex = new ArgumentException($"The sequence {paramName} has no elements.", paramName);
-                return (validation ?? new Validation()).AddException(ex);
-            }
-            else { return validation; }
-        }
-
-        public static Validation IsNotNegative(this Validation validation, int value, 
-            string valueName)
-        {
-            if (value < 0)
-            {
-                var ex = new ArgumentOutOfRangeException(valueName, $"{valueName} not positive (actual: {value})");
-                return (validation ?? new Validation()).AddException(ex);
-            }
-            else { return validation; }
-        }
-
-        public static Validation IsNotZero(this Validation validation, int value,
-            string valueName)
-        {
-            if (value == 0)
-            {
-                var ex = new ArgumentOutOfRangeException(valueName, $"{valueName} is zero");
-                return (validation ?? new Validation()).AddException(ex);
-            }
-            else { return validation; }
-        }
-
-        public static Validation InRangeInclusive(this Validation validation,
-            int minInclusive, int maxInclusive, int param, string paramName)
-        {
-            if (param < minInclusive || param > maxInclusive)
-            {
-                var ex = new ArgumentOutOfRangeException($"{paramName} is out of range (Value: {param}, Range: [{minInclusive}-{maxInclusive}]");
-                return (validation ?? new Validation()).AddException(ex);
-            }
-            return validation;
-        }
 
         public static Validation IsValidEnumValue<TEnum>(this Validation validation,
             TEnum param, string paramName) where TEnum : struct

@@ -10,7 +10,7 @@ General
 Naming
     - Names of all classes, structs, interfaces, delegates (basically any namespace-owned thing) should be PascalCase.
     - All public members of classes, structs, interfaces, enums, etc. should be PascalCase.
-    - All constants, events, enums, and enum values should be PascalCase. Avoid ALLCAPS unless it's a P/Invoke enum for Win32.
+    - All constants, events, properties, enums, and enum values should be PascalCase. Avoid ALLCAPS unless it's a P/Invoke enum for Win32.
     - Private fields and function arguments/locals should be camelCase.
     - Hungarian notation should only be used for UI controls (LabelAmount, TextPhoneNumber).
     - For properties that wrap around fields (which can't be auto-properties for whatever reason), name them in the camelCase variant of the property name.
@@ -25,7 +25,7 @@ Classes
 
 Structs
     - Struct fields should be private unless there's a compelling performance reason to making them public.
-    - Structs should also be immutable unless there's a compelling performance reason to making them public.
+    - Structs should also be immutable unless there's a compelling performance reason to making them mutable.
     - Don't use too many reference types in structs.
 
 Brackets

@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChrisAkridge.Common.Validation;
 using System.Collections.Generic;
+using ChrisAkridge.Common.Extensions;
 
 namespace ChrisAkridge.Common.Tests
 {
@@ -83,7 +84,7 @@ namespace ChrisAkridge.Common.Tests
         {
             var sequence = new int[] { 1, 2, 3 };
 
-            var validation = Validate.Begin().SequenceHasElements(sequence, nameof(sequence)).Check();
+            var validation = Validate.Begin().HasElements(sequence, nameof(sequence)).Check();
             if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
         }
 
@@ -95,7 +96,7 @@ namespace ChrisAkridge.Common.Tests
             bool success = false;
             try
             {
-                var validation = Validate.Begin().SequenceHasElements(sequence, nameof(sequence)).Check();
+                var validation = Validate.Begin().HasElements(sequence, nameof(sequence)).Check();
             }
             catch (ValidationFailedException vfex)
             {
@@ -339,5 +340,413 @@ namespace ChrisAkridge.Common.Tests
 
             if (!success) { Assert.Fail(); }
         }
-    }
+
+        [TestMethod]
+        public void IsNotNaN_WithNonNaNSingle()
+        {
+            float f = 1.0f;
+            var validation = Validate.Begin().IsNotNaN(f, "f").Check();
+            if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsNotNaN_WithNaNSingle()
+        {
+            float f = float.NaN;
+
+            bool success = false;
+            try
+            {
+                var validation = Validate.Begin().IsNotNaN(f, "f").Check();
+            }
+            catch (ValidationFailedException vfex)
+            {
+                Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
+                Assert.IsTrue(ExpectingException(typeof(ArgumentException), exceptions[0]));
+            }
+
+            if (!success) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsFinite_WithFiniteSingle()
+        {
+            float f = 1f;
+            var validation = Validate.Begin().IsFinite(f, "f").Check();
+            if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsFinite_WithPositiveInfinitySingle()
+        {
+            float f = float.PositiveInfinity;
+
+            bool success = false;
+            try
+            {
+                var validation = Validate.Begin().IsFinite(f, "f").Check();
+            }
+            catch (ValidationFailedException vfex)
+            {
+                Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
+                Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+            }
+
+            if (!success) { Assert.Fail(); }
+        }
+
+        [TestMethod]
+        public void IsFinite_WithNegativeInfinitySingle()
+        {
+            float f = float.NegativeInfinity;
+
+            bool success = false;
+            try
+            {
+                var validation = Validate.Begin().IsFinite(f, "f").Check();
+            }
+            catch (ValidationFailedException vfex)
+            {
+                Assert.AreEqual(vfex.Exceptions.Count(), 1);
+                List<Exception> exceptions = vfex.Exceptions.ToList();
+                success = true;
+                Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+            }
+
+            if (!success) { Assert.Fail(); }
+        }
+
+		[TestMethod]
+		public void IsNotNaN_WithNonNaNDouble()
+		{
+			double d = 1d;
+
+			var validation = Validate.Begin().IsNotNaN(d, "d").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsNotNaN_WithNaNDouble()
+		{
+			double d = double.NaN;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().IsNotNaN(d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsFinite_WithFiniteDouble()
+		{
+			double d = 1d;
+
+			var validation = Validate.Begin().IsFinite(d, "d").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsFinite_WithPositiveInfinityDouble()
+		{
+			double d = double.PositiveInfinity;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().IsFinite(d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsFinite_WithNegativeInfinityDouble()
+		{
+			double d = double.NegativeInfinity;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().IsFinite(d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsNotNegative_WithPositiveDouble()
+		{
+			double d = 1d;
+			var validation = Validate.Begin().IsNotNegative(d, "d").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsNotNegative_WithZeroDouble()
+		{
+			double d = 0d;
+			var validation = Validate.Begin().IsNotNegative(d, "d").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsNotNegative_WithNegativeDouble()
+		{
+			double d = -1d;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().IsNotNegative(d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsPositive_WithPositiveLong()
+		{
+			long l = 1L;
+			var validation = Validate.Begin().IsNotNegative(l, "l").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsPositive_WithNegativeLong()
+		{
+			long l = -1L;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().IsNotNegative(l, "l").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsPositive_WithPositiveDouble()
+		{
+			double d = 1d;
+			var validation = Validate.Begin().IsNotNegative(d, "d").Check();
+			if (validation != null && validation.Exceptions != null)
+			{ Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsPositive_WithNegativeDouble()
+		{
+			double d = -1L;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().IsNotNegative(d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success)
+			{ Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void InRangeInclusive_InRangeDouble()
+		{
+			double d = 5d;	
+
+			var validation = Validate.Begin().InRangeInclusive(0d, 10d, d, "d").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void InRangeInclusive_AboveRangeDouble()
+		{
+			double d = 15d;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().InRangeInclusive(0d, 10d, d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void InRangeInclusive_BelowRangeDouble()
+		{
+			double d = -5d;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().InRangeInclusive(0d, 10d, d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void InRangeExclusive_InRangeDouble()
+		{
+			double d = 5d;
+
+			var validation = Validate.Begin().InRangeExclusive(0d, 10d, d, "d").Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void InRangeExclusive_AboveRangeDouble()
+		{
+			double d = 15d;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().InRangeExclusive(0d, 10d, d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void InRangeExclusive_BelowRangeDouble()
+		{
+			double d = -5d;
+
+			bool success = false;
+			try
+			{
+				var validation = Validate.Begin().InRangeExclusive(0d, 10d, d, "d").Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(ArgumentOutOfRangeException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		private IEnumerable<int> FiniteSequence()
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				yield return i;
+			}
+		}
+
+		[InfiniteSequence]
+		private IEnumerable<int> InfiniteSequence()
+		{
+			while (true)
+			{
+				yield return 0;
+			}
+		}
+
+		[TestMethod]
+		public void IsFiniteSequence_WithFiniteSequence()
+		{
+			var validation = Validate.Begin().IsFiniteSequence((Func<IEnumerable<int>>)FiniteSequence,
+				nameof(FiniteSequence)).Check();
+			if (validation != null && validation.Exceptions != null) { Assert.Fail(); }
+		}
+
+		[TestMethod]
+		public void IsFiniteSequence_WithInfiniteSequence()
+		{
+			bool success = false;
+
+			try
+			{
+				var validation = Validate.Begin().IsFiniteSequence(
+					(Func<IEnumerable<int>>)InfiniteSequence, nameof(InfiniteSequence)).Check();
+			}
+			catch (ValidationFailedException vfex)
+			{
+				Assert.AreEqual(vfex.Exceptions.Count(), 1);
+				List<Exception> exceptions = vfex.Exceptions.ToList();
+				success = true;
+				Assert.IsTrue(ExpectingException(typeof(InvalidOperationException), exceptions[0]));
+			}
+
+			if (!success) { Assert.Fail(); }
+		}
+
+		// AreEqual<T>
+		// AreEqual with longs
+	}
 }

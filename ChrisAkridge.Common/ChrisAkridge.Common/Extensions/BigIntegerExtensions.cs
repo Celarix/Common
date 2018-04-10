@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ChrisAkridge.Common.Extensions
+{
+	public static class BigIntegerExtensions
+	{
+		public static int DigitCount(this BigInteger value)
+		{
+			// https://stackoverflow.com/a/34052627/2709212
+			// TODO: add test method
+
+			return (int)Math.Floor(BigInteger.Log10(value) + 1);
+		}
+	}
+}

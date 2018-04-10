@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,7 +41,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums.cs" />
+    <Compile Include="Exception.cs" />
+    <Compile Include="Extensions\BigIntegerExtensions.cs" />
+    <Compile Include="Extensions\BitwiseExtensions.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\NumericExtensions.cs" />
+    <Compile Include="Format.cs" />
+    <Compile Include="GlobalRandom.cs" />
+    <Compile Include="InfiniteSequenceAttribute.cs" />
+    <Compile Include="Numerics\BigDecimal.cs" />
+    <Compile Include="Numerics\DoubleHelper.cs" />
+    <Compile Include="Numerics\Float_M32E32.cs" />
     <Compile Include="UnreachableCodeException.cs" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="Validation\EnumerableValidationExtensions.cs" />
+    <Compile Include="Validation\NumericValidationExtensions.cs" />
     <Compile Include="Validation\Validate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\Validation.cs" />
