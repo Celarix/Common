@@ -8,6 +8,9 @@ namespace ChrisAkridge.Common
 {
 	public static class GlobalRandom
 	{
+		// TODO: implement Eric Lippert's better Random series
+		// https://ericlippert.com/2019/01/31/fixing-random-part-1/
+
 		private static Random random = new Random();
 
 		public static int Next() => random.Next();

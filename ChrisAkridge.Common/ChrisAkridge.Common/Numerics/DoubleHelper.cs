@@ -43,7 +43,7 @@ namespace ChrisAkridge.Common.Numerics
 
 		public DoubleHelper(double d)
 		{
-			this.RawBits = (ulong)BitConverter.DoubleToInt64Bits(d);
+			RawBits = (ulong)BitConverter.DoubleToInt64Bits(d);
 		}
 	}
 }

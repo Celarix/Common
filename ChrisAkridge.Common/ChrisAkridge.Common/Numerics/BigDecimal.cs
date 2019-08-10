@@ -366,5 +366,17 @@ namespace ChrisAkridge.Common.Numerics
 
 			return mantissaDouble * Math.Pow(10d, exponent);
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (!(obj is BigDecimal))
+			{
+				return false;
+			}
+
+			return (BigDecimal)obj == this;
+		}
+
+		public override int GetHashCode() => 137 ^ exponent ^ mantissa.GetHashCode();
 	}
 }

@@ -57,6 +57,7 @@
     <Compile Include="BigDecimalTests.cs" />
     <Compile Include="DoubleComparisonTests.cs" />
     <Compile Include="Float_M32E32Tests.cs" />
+    <Compile Include="CodepageTests.cs" />
     <Compile Include="UtilitiesTests.cs" />
     <Compile Include="ValidationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

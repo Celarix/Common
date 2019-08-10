@@ -54,6 +54,8 @@
     <Compile Include="Numerics\BigDecimal.cs" />
     <Compile Include="Numerics\DoubleHelper.cs" />
     <Compile Include="Numerics\Float_M32E32.cs" />
+    <Compile Include="Text\CustomCodepages\CodepageConverter.cs" />
+    <Compile Include="Text\CustomCodepages\Codepages.cs" />
     <Compile Include="UnreachableCodeException.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Validation\EnumerableValidationExtensions.cs" />

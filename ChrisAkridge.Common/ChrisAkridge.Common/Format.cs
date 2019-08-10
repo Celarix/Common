@@ -58,6 +58,7 @@ namespace ChrisAkridge.Common
 			{
 				// The inverse of the lowest possible long value cannot be expressed, so throw.
 				// (yes, I know there's a better solution)
+				// TODO: actually do this better solution - you know it's about -16 EiB, so write it like that
 				throw new ArgumentOutOfRangeException(nameof(fileSize), "The file size is too low to express.");
 			}
 			if (negative) { fileSize = -fileSize; }
