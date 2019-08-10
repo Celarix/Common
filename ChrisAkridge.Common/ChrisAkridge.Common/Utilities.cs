@@ -14,6 +14,7 @@ namespace ChrisAkridge.Common
 		/// <param name="fileSize">The size of the file or files in bytes.</param>
 		/// <returns>A string stating the size of the file or files.</returns>
 		/// <remarks>Each unit is equal to 1,024 times the size of the last unit.</remarks>
+        [Obsolete]
 		public static string GetFileSizeText(long fileSize)
 		{
 			bool negative = fileSize < 0L;

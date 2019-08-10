@@ -29,7 +29,6 @@ namespace ChrisAkridge.Common.Numerics
 			this.exponent = exponent;
 		}
 
-
 		public Float_M32E32(byte value) : this(value, 0) { }
 		public Float_M32E32(sbyte value) : this(value, 0) { }
 		public Float_M32E32(short value) : this(value, 0) { }

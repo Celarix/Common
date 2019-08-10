@@ -114,7 +114,74 @@ namespace ChrisAkridge.Common.Extensions
 			return value;
 		}
 
-		// WYLO: clamp for ulong, float, double, decimal
-		// import more SML extension methods
-	}
+		public static ulong Clamp(this ulong value, ulong min, ulong max)
+        {
+            Validate.Begin().IsTrue(min < max, $"The minimum ({min}) is more than the maximum ({max}).")
+                .Check();
+
+            if (value < min) { return min; }
+            else if (value > max) { return max; }
+            return value;
+        }
+
+        public static float Clamp(this float value, float min, float max)
+        {
+            Validate.Begin().IsTrue(min < max, $"The minimum ({min}) is more than the maximum ({max}).")
+                .Check();
+
+            if (value < min) { return min; }
+            else if (value > max) { return max; }
+            return value;
+        }
+
+        public static double Clamp(this double value, double min, ulong max)
+        {
+            Validate.Begin().IsTrue(min < max, $"The minimum ({min}) is more than the maximum ({max}).")
+                .Check();
+
+            if (value < min) { return min; }
+            else if (value > max) { return max; }
+            return value;
+        }
+
+        public static decimal Clamp(this decimal value, decimal min, decimal max)
+        {
+            Validate.Begin().IsTrue(min < max, $"The minimum ({min}) is more than the maximum ({max}).")
+                .Check();
+
+            if (value < min) { return min; }
+            else if (value > max) { return max; }
+            return value;
+        }
+
+        /// <summary>
+		///   Corrects the value of a single-precision float to the nearest
+		///   integral value if the float is very close to that value.
+		/// </summary>
+		/// <param name="value">The value to correct.</param>
+		/// <returns>
+		///   A whole-number corrected value, or the value if it was not close
+		///   enough to the nearest integers.
+		/// </returns>
+		public static float CorrectPrecision(this float value)
+        {
+            const float Epsilon = 0.0001f;
+
+            int ceiling = (int)(value + 1f);
+            int floor = (int)value;
+
+            if (Math.Abs(ceiling - value) < Epsilon)
+            {
+                return ceiling;
+            }
+            else if (Math.Abs(value - floor) < Epsilon)
+            {
+                return floor;
+            }
+            else
+            {
+                return value;
+            }
+        }
+    }
 }
