@@ -52,6 +52,10 @@ namespace ChrisAkridge.Common.Extensions
 			}
 			else
 			{
+				if (float.IsInfinity(absA + absB))
+				{
+					return diff < epsilon;
+				}
 				return diff / (absA + absB) < epsilon;
 			}
 		}
@@ -69,6 +73,10 @@ namespace ChrisAkridge.Common.Extensions
 			}
 			else
 			{
+				if (double.IsInfinity(absA + absB))
+				{
+					return diff < epsilon;
+				}
 				return diff / (absA + absB) < epsilon;
 			}
 		}

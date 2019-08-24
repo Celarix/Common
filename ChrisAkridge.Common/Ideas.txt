@@ -1,8 +1,0 @@
-ChrisAkridge.Common ideas:
-
-* A method that turns a number of bytes into a an abbreviated form. (1048576 bytes => 1.0 MB)
-* A method that takes (int number, string singular, string plural) and returns a plural if the number isn't 1.
-- A Times(Action<int>, int) method
-- Methods from SMLimitless benchmarking code
-
-- Method that uses StrCmpLogicalW out of shlwapi.dll (https://www.codeproject.com/Articles/11016/Numeric-String-Sort-in-C)

@@ -33,7 +33,7 @@ namespace ChrisAkridge.Common.Text.CustomCodepages
 			switch (index)
 			{
 				case 0:
-					return (IReadOnlyList<string>)CelarianAllPrintable;
+					return CelarianAllPrintable;
 				default:
 					throw new ArgumentOutOfRangeException($"No codepage at index {index} exists.");
 			}
