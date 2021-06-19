@@ -1,7 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Chris Akridge</Authors>
+    <Company>Akridgetech</Company>
+    <Description>A common utlities library for things I often need, plus some additional fun stuff.</Description>
+    <Copyright>This project is licensed under the MIT license.</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/ChrisAkridge/Common</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ChrisAkridge/Common</RepositoryUrl>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>Git</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 
 </Project>

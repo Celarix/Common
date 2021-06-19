@@ -25,25 +25,25 @@ namespace ChrisAkridge.Common.Numerics
 		public bool IsDenormal => RawExponent == 0 && RawMantissa != 0;
 
 		// Sign is 1 if positive, -1 if negative, 0 if zero
-		public int Sign => (IsZero) ? 0 : 1 - RawSign * 2;
-		public long Mantissa => (IsZero || IsDenormal || IsNaN || IsInfinity) ?
-				RawMantissa :
-				RawMantissa | 0x0010000000000000;
+		public int Sign => (IsZero) ? 0 : 1 - (RawSign * 2);
+		public long Mantissa => (IsZero || IsDenormal || IsNaN || IsInfinity)
+            ? RawMantissa
+            : RawMantissa | 0x0010000000000000;
 
 		public int Exponent
 		{
 			get
-			{
-				if (IsZero) { return 0; }
-				else if (IsDenormal) { return -1074; }
-				else if (IsNaN || IsInfinity) { return RawExponent; }
-				else { return RawExponent - 1075; }
-			}
+            {
+                if (IsZero) { return 0; }
+
+                if (IsDenormal) { return -1074; }
+
+                if (IsNaN || IsInfinity) { return RawExponent; }
+
+                return RawExponent - 1075;
+            }
 		}
 
-		public DoubleHelper(double d)
-		{
-			RawBits = (ulong)BitConverter.DoubleToInt64Bits(d);
-		}
-	}
+		public DoubleHelper(double d) => RawBits = (ulong)BitConverter.DoubleToInt64Bits(d);
+    }
 }

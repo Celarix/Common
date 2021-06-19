@@ -18,16 +18,14 @@ namespace ChrisAkridge.Common
 
         private const string ArgsName = "Arguments";
 
-        private readonly TExceptionArgs args;
-
-        public TExceptionArgs Arguments => args;
+        public TExceptionArgs Arguments { get; }
 
         public override string Message
         {
             get
             {
                 string baseMessage = base.Message;
-                return (args == null) ? baseMessage : $"{baseMessage} ({args.Message})";
+                return (Arguments == null) ? baseMessage : $"{baseMessage} ({Arguments.Message})";
             }
         }
 
@@ -37,21 +35,21 @@ namespace ChrisAkridge.Common
         public Exception(TExceptionArgs args, string message = null, 
             Exception innerException = null) : base(message, innerException)
         {
-            this.args = args;
+            this.Arguments = args;
         }
 
         [SecurityPermission(SecurityAction.LinkDemand, 
             Flags = SecurityPermissionFlag.SerializationFormatter)]
         private Exception(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            args = (TExceptionArgs)info.GetValue(ArgsName, typeof(TExceptionArgs));
+            Arguments = (TExceptionArgs)info.GetValue(ArgsName, typeof(TExceptionArgs));
         }
 
         [SecurityPermission(SecurityAction.LinkDemand,
             Flags = SecurityPermissionFlag.SerializationFormatter)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(ArgsName, args);
+            info.AddValue(ArgsName, Arguments);
             base.GetObjectData(info, context);
         }
 
@@ -59,7 +57,7 @@ namespace ChrisAkridge.Common
         {
             var other = obj as Exception<TExceptionArgs>;
             if (other == null) { return false; }
-            return Equals(args, other.args) && base.Equals(obj);
+            return Equals(Arguments, other.Arguments) && base.Equals(obj);
         }
 
         public override int GetHashCode() => base.GetHashCode();

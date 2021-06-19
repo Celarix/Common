@@ -15,18 +15,17 @@ namespace ChrisAkridge.Common.Numerics
 		// Constants
 
 		// Layout Fields
-		private int mantissa;
-		private int exponent;
 
-		// Properties
-		public int Mantissa => mantissa;
-		public int Exponent => exponent;
+        // Properties
+		public int Mantissa { get; }
 
-		// Constructors
+        public int Exponent { get; }
+
+        // Constructors
 		public Float_M32E32(int mantissa, int exponent)
 		{
-			this.mantissa = mantissa;
-			this.exponent = exponent;
+			Mantissa = mantissa;
+			Exponent = exponent;
 		}
 
 		public Float_M32E32(byte value) : this(value, 0) { }
@@ -39,13 +38,13 @@ namespace ChrisAkridge.Common.Numerics
 		{
 			if (value > int.MaxValue)
 			{
-				mantissa = (int)(value >> 1);
-				exponent = 1;
+				Mantissa = (int)(value >> 1);
+				Exponent = 1;
 			}
 			else
 			{
-				mantissa = (int)value;
-				exponent = 0;
+				Mantissa = (int)value;
+				Exponent = 0;
 			}
 		}
 

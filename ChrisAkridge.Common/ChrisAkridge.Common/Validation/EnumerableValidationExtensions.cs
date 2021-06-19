@@ -10,34 +10,25 @@ namespace ChrisAkridge.Common.Validation
 	{
 		public static Validation HasElements<T>(this Validation validation,
 				IEnumerable<T> enumerable, string paramName)
-		{
-			if (!enumerable.Any())
-			{
-				var ex = new ArgumentException($"The enumerable {paramName} has no elements.", paramName);
-				return (validation ?? new Validation()).AddException(ex);
-			}
-			else { return validation; }
-		}
+        {
+            if (enumerable.Any()) { return validation; }
+            
+            var ex = new ArgumentException($"The enumerable {paramName} has no elements.", paramName);
+            return (validation ?? new Validation()).AddException(ex);
+        }
 
 		public static Validation DoesNotContainNull<T>(this Validation validation,
 			IEnumerable<T> enumerable, string paramName) where T : class
 		{
-			int nullCount = 0;
+			int nullCount = enumerable.Count(item => item == null);
 
-			foreach (T item in enumerable)
-			{
-				if (item == null) { nullCount++; }
-			}
-
-			if (nullCount > 0)
-			{
-				string elementsWord = Utilities.Pluralize(nullCount, "element", "elements");
-				string message = $"The enumerable {paramName} has {nullCount} {elementsWord} that are null.";
-				var ex = new ArgumentException(message);
-				return (validation ?? new Validation()).AddException(ex);
-			}
-			else { return validation; }
-		}
+            if (nullCount <= 0) { return validation; }
+            
+            string elementsWord = Utilities.Pluralize(nullCount, "element", "elements");
+            string message = $"The enumerable {paramName} has {nullCount} {elementsWord} that are null.";
+            var ex = new ArgumentException(message);
+            return (validation ?? new Validation()).AddException(ex);
+        }
 
 		/// <summary>
 		/// Validates that a given enumberable method is not an infinite sequence.
@@ -61,14 +52,14 @@ namespace ChrisAkridge.Common.Validation
 			// https://stackoverflow.com/a/9469822/2709212
 			var methodInfo = d.Method;
 
-			if (methodInfo.GetCustomAttributes(typeof(InfiniteSequenceAttribute), false).Any())
-			{
-				string message = $"The enumerable method {methodName} is an infinite sequence.";
-				var ex = new InvalidOperationException(message);
-				return (validation ?? new Validation()).AddException(ex);
-			}
+            if (!methodInfo.GetCustomAttributes(typeof(InfiniteSequenceAttribute), false).Any())
+            {
+                return validation;
+            }
 
-			return validation;
-		}
+            string message = $"The enumerable method {methodName} is an infinite sequence.";
+            var ex = new InvalidOperationException(message);
+            return (validation ?? new Validation()).AddException(ex);
+        }
 	}
 }

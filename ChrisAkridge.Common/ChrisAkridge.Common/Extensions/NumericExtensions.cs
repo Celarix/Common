@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 using ChrisAkridge.Common.Validation;
 
 namespace ChrisAkridge.Common.Extensions
@@ -32,7 +29,8 @@ namespace ChrisAkridge.Common.Extensions
 			}
 		}
 
-		public static bool NearlyEqual(this float a, float b, float epsilon)
+		[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+        public static bool NearlyEqual(this float a, float b, float epsilon)
 		{
 			// https://stackoverflow.com/a/4915891/2709212
 			float absA = Math.Abs(a);
@@ -44,52 +42,53 @@ namespace ChrisAkridge.Common.Extensions
 				// Shortcut, handles infinities
 				return true;
 			}
-			else if (a == 0 || b == 0 || diff < MinNormalFloat)
-			{
-				// a or b is zero or both are extremely close to it
-				// relative error is less meaningful here
-				return diff < (epsilon * MinNormalFloat);
-			}
-			else
-			{
-				if (float.IsInfinity(absA + absB))
-				{
-					return diff < epsilon;
-				}
-				return diff / (absA + absB) < epsilon;
-			}
-		}
 
-		public static bool NearlyEqual(this double a, double b, double epsilon)
+            if (a == 0 || b == 0 || diff < MinNormalFloat)
+            {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * MinNormalFloat);
+            }
+
+            if (float.IsInfinity(absA + absB))
+            {
+                return diff < epsilon;
+            }
+            return diff / (absA + absB) < epsilon;
+        }
+
+		[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
+        public static bool NearlyEqual(this double a, double b, double epsilon)
 		{
 			double absA = Math.Abs(a);
 			double absB = Math.Abs(b);
 			double diff = Math.Abs(a - b);
 
 			if (a == b) { return true; }
-			else if (a == 0d || b == 0d || diff < MinNormalDouble)
-			{
-				return diff < (epsilon * MinNormalDouble);
-			}
-			else
-			{
-				if (double.IsInfinity(absA + absB))
-				{
-					return diff < epsilon;
-				}
-				return diff / (absA + absB) < epsilon;
-			}
-		}
+
+            if (a == 0d || b == 0d || diff < MinNormalDouble)
+            {
+                return diff < (epsilon * MinNormalDouble);
+            }
+
+            if (double.IsInfinity(absA + absB))
+            {
+                return diff < epsilon;
+            }
+            return diff / (absA + absB) < epsilon;
+        }
 
 		public static bool BetweenInclusive(this float x, float a, float b)
 		{
 			if (a > b) { return (x >= a) && (x <= b); }
-			else if (a < b) { return (x <= b) && (x >= a); }
-			else if (a.NearlyEqual(b, 0.00001f))
-			{
-				return (x.NearlyEqual(a, 0.00001f)) && (x.NearlyEqual(b, 0.00001f));
-			}
-			return false;
+
+            if (a < b) { return (x <= b) && (x >= a); }
+
+            if (a.NearlyEqual(b, 0.00001f))
+            {
+                return x.NearlyEqual(a, 0.00001f) && x.NearlyEqual(b, 0.00001f);
+            }
+            return false;
 		}
 
 		public static int Clamp(this int value, int min, int max)
@@ -98,9 +97,9 @@ namespace ChrisAkridge.Common.Extensions
 				.Check();
 			
 			if (value < min) { return min; }
-			else if (value > max) { return max; }
-			return value;
-		}
+
+            return value > max ? max : value;
+        }
 
 		public static uint Clamp(this uint value, uint min, uint max)
 		{
@@ -108,9 +107,9 @@ namespace ChrisAkridge.Common.Extensions
 				.Check();
 
 			if (value < min) { return min; }
-			else if (value > max) { return max; }
-			return value;
-		}
+
+            return value > max ? max : value;
+        }
 
 		public static long Clamp(this long value, long min, long max)
 		{
@@ -118,9 +117,9 @@ namespace ChrisAkridge.Common.Extensions
 				.Check();
 
 			if (value < min) { return min; }
-			else if (value > max) { return max; }
-			return value;
-		}
+
+            return value > max ? max : value;
+        }
 
 		public static ulong Clamp(this ulong value, ulong min, ulong max)
         {
@@ -128,8 +127,8 @@ namespace ChrisAkridge.Common.Extensions
                 .Check();
 
             if (value < min) { return min; }
-            else if (value > max) { return max; }
-            return value;
+
+            return value > max ? max : value;
         }
 
         public static float Clamp(this float value, float min, float max)
@@ -138,8 +137,8 @@ namespace ChrisAkridge.Common.Extensions
                 .Check();
 
             if (value < min) { return min; }
-            else if (value > max) { return max; }
-            return value;
+
+            return value > max ? max : value;
         }
 
         public static double Clamp(this double value, double min, ulong max)
@@ -148,8 +147,8 @@ namespace ChrisAkridge.Common.Extensions
                 .Check();
 
             if (value < min) { return min; }
-            else if (value > max) { return max; }
-            return value;
+
+            return value > max ? max : value;
         }
 
         public static decimal Clamp(this decimal value, decimal min, decimal max)
@@ -158,8 +157,8 @@ namespace ChrisAkridge.Common.Extensions
                 .Check();
 
             if (value < min) { return min; }
-            else if (value > max) { return max; }
-            return value;
+
+            return value > max ? max : value;
         }
 
         /// <summary>
@@ -182,14 +181,12 @@ namespace ChrisAkridge.Common.Extensions
             {
                 return ceiling;
             }
-            else if (Math.Abs(value - floor) < Epsilon)
+
+            if (Math.Abs(value - floor) < Epsilon)
             {
                 return floor;
             }
-            else
-            {
-                return value;
-            }
+            return value;
         }
     }
 }

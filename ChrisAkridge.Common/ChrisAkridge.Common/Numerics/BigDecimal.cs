@@ -19,9 +19,8 @@ namespace ChrisAkridge.Common.Numerics
 	public struct BigDecimal : IComparable<BigDecimal>
 	{
 		private BigInteger mantissa;
-		private int exponent;
 
-		/// <summary>
+        /// <summary>
 		/// The maximum number of places that a division will be calculated to.
 		/// </summary>
 		public static int DivisionPrecision = 50;
@@ -61,13 +60,13 @@ namespace ChrisAkridge.Common.Numerics
 		/// <summary>
 		/// Gets the exponent - the power of 10 the mantissa is raised to.
 		/// </summary>
-		public int Exponent => exponent;
+		public int Exponent { get; private set; }
 
-		// Constructors
+        // Constructors
 		public BigDecimal(BigInteger mantissa, int exponent)
 		{
 			this.mantissa = mantissa;
-			this.exponent = exponent;
+			Exponent = exponent;
 
 			Normalize();
 		}
@@ -90,34 +89,39 @@ namespace ChrisAkridge.Common.Numerics
 			foreach (char c in toParse)
 			{
 				if (!char.IsNumber(c) && c != '.' && c != '-') { return false; }
-				
-				if (c == '.')
-				{
-					if (!seenDecimalPoint) { seenDecimalPoint = true; }
-					else { return false; }
-				}
-			}
+
+                if (c != '.') { continue; }
+
+				if (!seenDecimalPoint) { seenDecimalPoint = true; }
+                else { return false; }
+            }
 
 			return true;
 		}
 
 		public static bool TryParse(string s, out BigDecimal value)
 		{
-			if (!ValidateParseString(s)) { value = Zero; return false; }
+            value = new BigDecimal();
+            
+            if (!ValidateParseString(s))
+            {
+                value = Zero;
+                return false;
+            }
 
 			int indexOfDecimalPoint = s.IndexOf('.');
 			value.mantissa = BigInteger.Parse(s.Replace(".", ""));
 			if (indexOfDecimalPoint == -1 || indexOfDecimalPoint == s.Length - 1)
 			{
 				// Number is an integer of the form "321" or "321."
-				value.exponent = 0;
+				value.Exponent = 0;
 			}
 			else
 			{
 				// Number is a decimal of the form "321.987"
 				// Each digit to the right of the decimal point is -1 to the exponent
-				int decimalPlaces = (s.Length - 1) - indexOfDecimalPoint;
-				value.exponent = -decimalPlaces;
+				int decimalPlaces = s.Length - 1 - indexOfDecimalPoint;
+				value.Exponent = -decimalPlaces;
 			}
 
 			value.Normalize();
@@ -126,8 +130,7 @@ namespace ChrisAkridge.Common.Numerics
 
 		public static BigDecimal Parse(string s)
 		{
-			BigDecimal result = Zero;
-			if (!TryParse(s, out result))
+            if (!TryParse(s, out var result))
 			{
 				throw new ArgumentException($"The input string {s} is not a valid decimal number.");
 			}
@@ -139,39 +142,39 @@ namespace ChrisAkridge.Common.Numerics
 		{
 			var mantissaString = mantissa.ToString(CultureInfo.InvariantCulture);
 			if (Exponent == 0) { return mantissaString;  }
-			else if (Exponent > 0)
-			{
-				string trailingZeroes = new string('0', Exponent);
-				return string.Concat(mantissaString, trailingZeroes);
-			}
-			else if (Exponent < 0)
-			{
-				// Insert a decimal point such that -exponent digits are to the right of it
-				string result = mantissaString;
-				if (result.Length < -exponent)
-				{
-					result = string.Concat(new string('0', -exponent - result.Length), result);
-				}
-				int insertDecimalAt = (result.Length) + exponent;
-				return result.Insert(insertDecimalAt, ".");
-			}
 
-			throw new UnreachableCodeException();
+            if (Exponent > 0)
+            {
+                string trailingZeroes = new string('0', Exponent);
+                return string.Concat(mantissaString, trailingZeroes);
+            }
+
+            if (Exponent < 0)
+            {
+                // Insert a decimal point such that -exponent digits are to the right of it
+                string result = mantissaString;
+                if (result.Length < -Exponent)
+                {
+                    result = string.Concat(new string('0', -Exponent - result.Length), result);
+                }
+                int insertDecimalAt = result.Length + Exponent;
+                return result.Insert(insertDecimalAt, ".");
+            }
+
+            throw new UnreachableCodeException();
 		}
 
-		public string ToInternalRepresentationString()
-		{
-			return string.Concat(mantissa.ToString(CultureInfo.InvariantCulture), "e", exponent);
-		}
+		public string ToInternalRepresentationString() =>
+            string.Concat(mantissa.ToString(CultureInfo.InvariantCulture), "e", Exponent);
 
-		/// <summary>
+        /// <summary>
 		/// Removes trailing zeroes on the mantissa.
 		/// </summary>
 		private void Normalize()
 		{
 			if (mantissa.IsZero)
 			{
-				exponent = 0;
+				Exponent = 0;
 			}
 			else
 			{
@@ -179,12 +182,12 @@ namespace ChrisAkridge.Common.Numerics
 				while (remainder == 0)
 				{
 					var shortened = BigInteger.DivRem(mantissa, 10, out remainder);
-					if (remainder == 0)
-					{
-						mantissa = shortened;
-						exponent++;
-					}
-				}
+
+                    if (remainder != 0) { continue; }
+                    
+                    mantissa = shortened;
+                    Exponent++;
+                }
 			}
 		}
 
@@ -203,7 +206,7 @@ namespace ChrisAkridge.Common.Numerics
 		// Arithmetic, mathematical methods
 		public static BigDecimal Identity(BigDecimal value) => value;
 
-		public static BigDecimal Inverse(BigDecimal value) => new BigDecimal(-value.mantissa, value.exponent);
+		public static BigDecimal Inverse(BigDecimal value) => new BigDecimal(-value.mantissa, value.Exponent);
 
 		public static BigDecimal Increment(BigDecimal value) => Add(value, 1);
 
@@ -222,14 +225,12 @@ namespace ChrisAkridge.Common.Numerics
 			return result;
 		}
 
-		public static BigDecimal Add(BigDecimal a, BigDecimal b)
-		{
-			return (a.Exponent > b.Exponent)
-				? new BigDecimal(AlignExponent(a, b) + b.Mantissa, b.Exponent)
-				: new BigDecimal(AlignExponent(b, a) + a.Mantissa, a.Exponent);
-		}
+		public static BigDecimal Add(BigDecimal a, BigDecimal b) =>
+            a.Exponent > b.Exponent
+                ? new BigDecimal(AlignExponent(a, b) + b.Mantissa, b.Exponent)
+                : new BigDecimal(AlignExponent(b, a) + a.Mantissa, a.Exponent);
 
-		public static BigDecimal Subtract(BigDecimal a, BigDecimal b) => Add(a, Inverse(b));
+        public static BigDecimal Subtract(BigDecimal a, BigDecimal b) => Add(a, Inverse(b));
 
 		public static BigDecimal Multiply(BigDecimal a, BigDecimal b) =>
 			new BigDecimal(a.Mantissa * b.Mantissa, a.Exponent + b.Exponent);
@@ -243,7 +244,7 @@ namespace ChrisAkridge.Common.Numerics
 			}
 
 			a.mantissa *= BigInteger.Pow(10, exponentDifference);
-			return new BigDecimal(a.mantissa / b.mantissa, a.exponent - b.exponent - exponentDifference);
+			return new BigDecimal(a.mantissa / b.mantissa, a.Exponent - b.Exponent - exponentDifference);
 		}
 
 		public static BigDecimal Pow(double value, double power)
@@ -251,7 +252,7 @@ namespace ChrisAkridge.Common.Numerics
 			var tmp = One;
 			while (Math.Abs(power) > 100)
 			{
-				var diff = (power > 0) ? 100 : -100;
+				var diff = power > 0 ? 100 : -100;
 				tmp *= Math.Pow(value, diff);
 				power -= diff;
 			}
@@ -275,7 +276,7 @@ namespace ChrisAkridge.Common.Numerics
 		// Ln
 
 		public static BigDecimal Abs(BigDecimal value) =>
-			new BigDecimal((value.mantissa < 0) ? -value.mantissa : value.mantissa, value.exponent);
+			new BigDecimal(value.mantissa < 0 ? -value.mantissa : value.mantissa, value.Exponent);
 
 		// Floor
 		// Ceiling
@@ -291,12 +292,12 @@ namespace ChrisAkridge.Common.Numerics
 		public static BigDecimal operator *(BigDecimal a, BigDecimal b) => Multiply(a, b);
 		public static BigDecimal operator /(BigDecimal a, BigDecimal b) => Divide(a, b);
 
-		public static bool operator <(BigDecimal a, BigDecimal b) => (a.CompareTo(b)) < 0;
-		public static bool operator >(BigDecimal a, BigDecimal b) => (a.CompareTo(b)) > 0;
-		public static bool operator ==(BigDecimal a, BigDecimal b) => (a.CompareTo(b)) == 0;
-		public static bool operator !=(BigDecimal a, BigDecimal b) => (a.CompareTo(b)) != 0;
-		public static bool operator <=(BigDecimal a, BigDecimal b) => (a < b) || (a == b);
-		public static bool operator >=(BigDecimal a, BigDecimal b) => (a > b) || (a == b);
+		public static bool operator <(BigDecimal a, BigDecimal b) => a.CompareTo(b) < 0;
+		public static bool operator >(BigDecimal a, BigDecimal b) => a.CompareTo(b) > 0;
+		public static bool operator ==(BigDecimal a, BigDecimal b) => a.CompareTo(b) == 0;
+		public static bool operator !=(BigDecimal a, BigDecimal b) => a.CompareTo(b) != 0;
+		public static bool operator <=(BigDecimal a, BigDecimal b) => a < b || a == b;
+		public static bool operator >=(BigDecimal a, BigDecimal b) => a > b || a == b;
 
 		// Interface methods
 		public int CompareTo(BigDecimal other)
@@ -306,17 +307,14 @@ namespace ChrisAkridge.Common.Numerics
 				return mantissa.Sign.CompareTo(other.mantissa.Sign);
 			}
 
-			if (exponent != other.exponent)
-			{
-				var thisLogEstimate = Mantissa.DigitCount() + Exponent;
-				var otherLogEstimate = other.Mantissa.DigitCount() + other.Exponent;
-				return thisLogEstimate.CompareTo(otherLogEstimate);
-			}
+            if (Exponent == other.Exponent) { return mantissa.CompareTo(other.mantissa); }
+            
+            var thisLogEstimate = Mantissa.DigitCount() + Exponent;
+            var otherLogEstimate = other.Mantissa.DigitCount() + other.Exponent;
+            return thisLogEstimate.CompareTo(otherLogEstimate);
 
-			return mantissa.CompareTo(other.mantissa);
-		}
+        }
 		// IEquatable
-
 
 		// Conversions and casts
 		public static implicit operator BigDecimal(byte value) => new BigDecimal(value, 0);
@@ -334,7 +332,7 @@ namespace ChrisAkridge.Common.Numerics
 			var mantissa = (BigInteger)value;
 			var exponent = 0;
 			double scaleFactor = 1d;
-			while (Math.Abs(value * scaleFactor - (double)mantissa) > 0)
+			while (Math.Abs((value * scaleFactor) - (double)mantissa) > 0)
 			{
 				exponent -= 1;
 				scaleFactor *= 10;
@@ -349,22 +347,25 @@ namespace ChrisAkridge.Common.Numerics
 			double mantissaDouble = (double)value.Mantissa;
 			int exponent = value.Exponent;
 
-			if (double.IsPositiveInfinity(mantissaDouble) || double.IsNegativeInfinity(mantissaDouble))
-			{
-				// Mantissa is too big to fit in the double
-				// This is bad; we need to do a more expensive operation to get it to fit
-				double mantissaLog10 = BigInteger.Log10(value.Mantissa);
-				double resultLog10 = mantissaLog10 + value.Exponent;
+            if (!double.IsPositiveInfinity(mantissaDouble) && !double.IsNegativeInfinity(mantissaDouble))
+            {
+                return mantissaDouble * Math.Pow(10d, exponent);
+            }
 
-				if (resultLog10 < -308) { return 0d; }
-				else if (resultLog10 > 308) { return double.PositiveInfinity; }
+            // Mantissa is too big to fit in the double
+            // This is bad; we need to do a more expensive operation to get it to fit
+            double mantissaLog10 = BigInteger.Log10(value.Mantissa);
+            double valueLog10 = mantissaLog10 + value.Exponent;
 
-				int placesToGetInRange = (int)mantissaLog10 - 300;
-				mantissaDouble = (double)(value.Mantissa / BigInteger.Parse("1" + new string('0', placesToGetInRange)));
-				exponent += placesToGetInRange;
-			}
+            if (valueLog10 < -308) { return 0d; }
 
-			return mantissaDouble * Math.Pow(10d, exponent);
+            if (valueLog10 > 308) { return double.PositiveInfinity; }
+
+            int placesToGetInRange = (int)mantissaLog10 - 300;
+            mantissaDouble = (double)(value.Mantissa / BigInteger.Parse("1" + new string('0', placesToGetInRange)));
+            exponent += placesToGetInRange;
+
+            return mantissaDouble * Math.Pow(10d, exponent);
 		}
 
 		public override bool Equals(object obj)
@@ -377,6 +378,6 @@ namespace ChrisAkridge.Common.Numerics
 			return (BigDecimal)obj == this;
 		}
 
-		public override int GetHashCode() => 137 ^ exponent ^ mantissa.GetHashCode();
+		public override int GetHashCode() => 137 ^ Exponent ^ mantissa.GetHashCode();
 	}
 }

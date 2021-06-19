@@ -6,15 +6,12 @@ namespace ChrisAkridge.Common.Validation
 	{
 		public static Validation AreEqual(this Validation validation, 
 			long param1, string param1Name, long param2, string param2Name)
-		{
-			if (param1 != param2)
-			{
-				var ex =  new ArgumentException($"{param1Name} ({param1}) is not equal to {param2Name} ({param2}).");
-				return (validation ?? new Validation()).AddException(ex);
-			}
-
-			return validation;
-		}
+        {
+            if (param1 == param2) { return validation; }
+            
+            var ex = new ArgumentException($"{param1Name} ({param1}) is not equal to {param2Name} ({param2}).");
+            return (validation ?? new Validation()).AddException(ex);
+        }
 
 		public static Validation IsFinite(this Validation validation, float param, string paramName)
 		{
